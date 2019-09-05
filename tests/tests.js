@@ -39,7 +39,22 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
       });
     });
   };
+
   exports.defineManualTests = function (contentEl, createActionButton) {
+
+    createActionButton('Magic R$1 Charge', function(){
+      window.ZoopAPI.initialize();
+
+      addListener('showMessage'      , forShowMessage);
+      addListener('paymentFailed'    , forPaymentFailed);
+      addListener('paymentDuplicated', forPaymentDuplicated);
+      addListener('paymentSuccessful', forPaymentSuccessful);
+
+      window.ZoopAPI.charge(
+        1, 0, 1, '-',
+        '-', '-'
+      );
+    });
 
     createActionButton('Initialize API', function () {
       window.ZoopAPI.initialize();
@@ -56,8 +71,7 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
 
       window.ZoopAPI.startTerminalsDiscovery(
         function (err) {
-          console.log('ERR ', arguments);
-          contentEl.innerHTML = '<p>ERR ' + err + '</p>';
+          contentEl.innerHTML = '<p>ERR ${err}</p>';
         }
       )
     });
@@ -86,23 +100,16 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
         return;
       isButtonForChargeCreated = true;
       createActionButton('Charge R$1', function () {
-        window.ZoopAPI.initialize();
+
+        addListener('showMessage'      , forShowMessage);
+        addListener('paymentFailed'    , forPaymentFailed);
+        addListener('paymentDuplicated', forPaymentDuplicated);
+        addListener('paymentSuccessful', forPaymentSuccessful);
+
         window.ZoopAPI.charge(
           1, 99, 1, '-',
-          '-', '-',
-          function (ok) {
-            contentEl.innerHTML += `
-              <p>charge <b>success</b></p>
-              <pre>${JSON.stringify(arguments, null, 2)}</pre>
-            `;
-          },
-          function (err) {
-            contentEl.innerHTML += `
-              <p>charge <b>error</b></p>
-              <pre>${JSON.stringify(err, null, 2)}</pre>
-            `;
-          }
-        )
+          '-', '-'
+        );
       });
     }
 
@@ -121,6 +128,34 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
     function addListener(name, method) {
       document.removeEventListener(name, method);
       document.addEventListener(name, method);
+    }
+
+    var forShowMessage = function(e){
+      contentEl.innerHTML = `
+        <p>Event <i>showMessage</i></p>
+        <pre>${JSON.stringify(e.detail, null, 2)}</pre>
+      `.concat(contentEl.innerHTML);
+    }
+
+    var forPaymentFailed = function(e){
+      contentEl.innerHTML = `
+        <p>Event <i>paymentFailed</i></p>
+        <pre>${JSON.stringify(e.detail, null, 2)}</pre>
+      `.concat(contentEl.innerHTML);
+    }
+
+    var forPaymentDuplicated = function(e){
+      contentEl.innerHTML = `
+        <p>Event <i>paymentDuplicated</i></p>
+        <pre>${JSON.stringify(e.detail, null, 2)}</pre>
+      `.concat(contentEl.innerHTML);
+    }
+
+    var forPaymentSuccessful = function(e){
+      contentEl.innerHTML = `
+        <p>Event <i>paymentSuccessful </i></p>
+        <pre>${JSON.stringify(e.detail, null, 2)}</pre>
+      `.concat(contentEl.innerHTML);
     }
 
     var forDisabledBluetooth = function () {
@@ -159,7 +194,6 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
 //        contentEl.innerHTML += '<p>Err ' + err + '</p>';
 //      });
     };
-
 
   };
 

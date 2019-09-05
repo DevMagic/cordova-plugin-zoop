@@ -4,10 +4,13 @@ import android.util.Log;
 
 import com.zoop.zoopandroidsdk.TerminalListManager;
 import com.zoop.zoopandroidsdk.ZoopTerminalPayment;
+import com.zoop.zoopandroidsdk.commons.TypeTerminalKeyEnum;
+import com.zoop.zoopandroidsdk.commons.TypeTerminalKeyErrorEnum;
 import com.zoop.zoopandroidsdk.terminal.ApplicationDisplayListener;
 import com.zoop.zoopandroidsdk.terminal.DeviceSelectionListener;
 import com.zoop.zoopandroidsdk.terminal.TerminalMessageType;
 import com.zoop.zoopandroidsdk.terminal.TerminalPaymentListener;
+import com.zoop.zoopandroidsdk.terminal.ZoopTerminalKeyValidatorListener;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -26,11 +29,17 @@ import static org.apache.cordova.PluginResult.Status.OK;
 /**
 * This class echoes a string called from JavaScript.
 */
-public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, TerminalPaymentListener, ApplicationDisplayListener {
+public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, TerminalPaymentListener, ApplicationDisplayListener, ZoopTerminalKeyValidatorListener {
 
     private CallbackContext terminalDiscoveryCallback;
     private CallbackContext callback;
-    private TerminalListManager terminalListManager;
+    private TerminalListManager _terminalListManager;
+
+    private TerminalListManager getTerminalListManager(){
+        if (_terminalListManager == null)
+            _terminalListManager = new TerminalListManager(this, cordova.getContext());
+        return _terminalListManager;
+    }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
@@ -54,7 +63,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
                     charge(chargeArgs);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    terminalDiscoveryCallback.error(e.getMessage());
+                    callback.error(e.getMessage());
                 }
             });
             return true;
@@ -74,35 +83,41 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
         }
         try {
             JSONObject device = ((JSONObject) args.get(0));
-            terminalListManager.requestZoopDeviceSelection(device);
+            getTerminalListManager().requestZoopDeviceSelection(device);
         } catch (JSONException e) {
             terminalDiscoveryCallback.error(e.getMessage());
         }
     }
 
     private void enableDeviceBluetoothAdapter() {
-        terminalListManager.enableDeviceBluetoothAdapter();
+        getTerminalListManager().enableDeviceBluetoothAdapter();
     }
 
     @Override
     public void onDestroy() {
         Log.i("ZoopAPI", "onDestroy");
-        if (this.terminalListManager != null)
-            this.terminalListManager.finishTerminalDiscovery();
+        if (this._terminalListManager != null)
+            getTerminalListManager().finishTerminalDiscovery();
         super.onDestroy();
     }
 
     private void charge(ChargeArgs args) throws Exception {
         Log.i("ZoopAPI", ">>> charge");
-        ZoopTerminalPayment zoopTerminalPayment = new ZoopTerminalPayment();
+        Log.d("ZoopAPI", "JSON " + getTerminalListManager().getCurrentSelectedZoopTerminal().toString(2));
+        JSONArray jsA = new JSONArray(getTerminalListManager().getAvailableZoopTerminalDevices());
+        getTerminalListManager().checkTerminalCompatibility(getTerminalListManager().getCurrentSelectedZoopTerminal(), this);
 
+        Log.d("ZoopAPI", "JSA " + jsA.toString(2));
+
+        ZoopTerminalPayment zoopTerminalPayment = new ZoopTerminalPayment();
+        Log.d("ZoopAPI", "Minimun " + zoopTerminalPayment.getMinimumChargeValue().doubleValue());
         zoopTerminalPayment.setTerminalPaymentListener(this);
         zoopTerminalPayment.setApplicationDisplayListener(this);
 
         zoopTerminalPayment.charge(
                 BigDecimal.valueOf(args.valueToCharge),
-                args.iNumberOfInstallments,
                 args.paymentOption,
+                args.iNumberOfInstallments,
                 args.marketplaceId,
                 args.sellerId,
                 args.publishableKey);
@@ -110,9 +125,8 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
 
     private void startTerminalsDiscovery() {
         Log.i("ZoopAPI", ">>> startTerminalsDiscovery");
-        terminalListManager = new TerminalListManager(this, cordova.getContext());
         try {
-            terminalListManager.startTerminalsDiscovery();
+            getTerminalListManager().startTerminalsDiscovery();
         } catch (Exception e){
             callback.error("Hey dev, try to initialize the API first - " + e.getMessage());
         }
@@ -184,7 +198,6 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
                 "deviceSelectedResult",
                 data));
         result.setKeepCallback(true);
-        Log.d("ZoopAPI", ">>> deviceSelectedResult - CALL BACK");
         terminalDiscoveryCallback.sendPluginResult(result);
     }
 
@@ -192,23 +205,23 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
     // TerminalPaymentListener
     @Override
     public void paymentFailed(JSONObject data) {
-        try {
-            Log.e("Zoop", "paymentFailed " + data.toString(2));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        terminalDiscoveryCallback.error(getResult("TerminalPaymentListener", "paymentFailed", data));
+        Log.i("ZoopAPI", ">>> paymentFailed");
+        callback.success(getResult(
+                "TerminalPaymentListener",
+                "paymentFailed",
+                data));
     }
 
     // TerminalPaymentListener
     @Override
     public void paymentDuplicated(JSONObject data) {
-        try {
-            Log.e("Zoop", "paymentDuplicated " + data.toString(2));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        terminalDiscoveryCallback.error(getResult("TerminalPaymentListener", "paymentDuplicated", data));
+        Log.i("ZoopAPI", ">>> paymentDuplicated");
+        PluginResult result = new PluginResult(OK, getResult(
+                "TerminalPaymentListener",
+                "paymentDuplicated",
+                data));
+        callback.sendPluginResult(result);
+
     }
 
     // TerminalPaymentListener
@@ -219,7 +232,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        terminalDiscoveryCallback.success(getResult("TerminalPaymentListener", "paymentSuccessful", data));
+        callback.success(getResult("TerminalPaymentListener", "paymentSuccessful", data));
     }
 
     // TerminalPaymentListener
@@ -262,7 +275,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
 
         PluginResult result = new PluginResult(OK, getResult("ApplicationDisplayListener", "showMessage", data));
         result.setKeepCallback(true);
-        terminalDiscoveryCallback.sendPluginResult(result);
+        callback.sendPluginResult(result);
     }
 
     // ApplicationDisplayListener
@@ -281,7 +294,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
 
         PluginResult result = new PluginResult(OK, getResult("ApplicationDisplayListener", "showMessage", data));
         result.setKeepCallback(true);
-        terminalDiscoveryCallback.sendPluginResult(result);
+        callback.sendPluginResult(result);
     }
 
     private JSONObject getResult(String interfaceName, String method, Object data) {
@@ -294,6 +307,24 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
             err.printStackTrace();
         }
         return js;
+    }
+
+    @Override
+    public void compatibilityResult(TypeTerminalKeyEnum typeTerminalKeyEnum, JSONObject jsonObject) {
+        Log.d("ZoopAPI", "compatibilityResult");
+        Log.d("ZoopAPI", typeTerminalKeyEnum.name());
+        try {
+            Log.d("ZoopAPI", jsonObject.toString(2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void compatibilityError(TypeTerminalKeyErrorEnum typeTerminalKeyErrorEnum, String s) {
+        Log.d("ZoopAPI", "compatibilityError");
+        Log.d("ZoopAPI", typeTerminalKeyErrorEnum.name());
+        Log.d("ZoopAPI", s);
     }
 
     public class ChargeArgs{

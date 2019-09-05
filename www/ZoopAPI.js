@@ -26,8 +26,16 @@ cordova.define("cordova-plugin-zoop.ZoopAPI", function(require, exports, module)
     }
 
     exports.charge = function (valueToCharge, paymentOption, numberOfInstallments, marketplaceId,
-        sellerId, publishableKey, success, error) {
-        exec(success, error, 'ZoopAPI', 'charge', [valueToCharge, paymentOption,
+        sellerId, publishableKey) {
+        var callback = function(result){
+          if (result.method){
+            var evt = new CustomEvent(result.method, {
+              detail: result.data
+            });
+            document.dispatchEvent(evt);
+          }
+        };
+        exec(callback, callback, 'ZoopAPI', 'charge', [valueToCharge, paymentOption,
             numberOfInstallments, marketplaceId, sellerId, publishableKey]);
     };
 
