@@ -80,6 +80,32 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
       });
     };
 
+    var isButtonForChargeCreated = false;
+    var createButtonForCharge = function() {
+      if (isButtonForChargeCreated)
+        return;
+      isButtonForChargeCreated = true;
+      createActionButton('Charge R$1', function () {
+        window.ZoopAPI.initialize();
+        window.ZoopAPI.charge(
+          1, 99, 1, '-',
+          '-', '-',
+          function (ok) {
+            contentEl.innerHTML += `
+              <p>charge <b>success</b></p>
+              <pre>${JSON.stringify(arguments, null, 2)}</pre>
+            `;
+          },
+          function (err) {
+            contentEl.innerHTML += `
+              <p>charge <b>error</b></p>
+              <pre>${JSON.stringify(err, null, 2)}</pre>
+            `;
+          }
+        )
+      });
+    }
+
     var testBluetooth = 'TODO';
 
     var showStartTerminalInstructions = function() {
@@ -107,6 +133,7 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
     var forDeviceSelectedResult = function(e){
       contentEl.innerHTML += '<p>Event <i>deviceSelectedResult</i></p>';
       contentEl.innerHTML += '<pre>' + JSON.stringify(e.detail, null, 2) + '</pre>';
+      createButtonForCharge();
     };
 
     var deviceIsNotShowing = true;
@@ -119,7 +146,6 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
       if (deviceIsNotShowing)
         for (var i in devices){
           let device = devices[i];
-          console.log('Each ' + device);
           createButtonForSelectDevice(device.name, device);
         }
       deviceIsNotShowing = false;
@@ -133,6 +159,7 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
 //        contentEl.innerHTML += '<p>Err ' + err + '</p>';
 //      });
     };
+
 
   };
 
