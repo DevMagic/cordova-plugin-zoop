@@ -7,10 +7,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "cordova-paramedic": "^0.5.0",
-    "user": "0.0.0"
   },
   "devDependencies": {
+    "cordova-paramedic": "^0.5.0",
     "jasmine": "^3.4.0"
   },
   "scripts": {
