@@ -15,7 +15,7 @@ cordova.define("cordova-plugin-zoop.ZoopAPI", function(require, exports, module)
             var evt = new CustomEvent(result.method, {
               detail: result.data
             });
-            document.dispatchEvent(evt);
+            window.dispatchEvent(evt);
           }
         };
         exec(success, error, 'ZoopAPI', 'startTerminalsDiscovery', []);
@@ -32,7 +32,7 @@ cordova.define("cordova-plugin-zoop.ZoopAPI", function(require, exports, module)
             var evt = new CustomEvent(result.method, {
               detail: result.data
             });
-            document.dispatchEvent(evt);
+            window.dispatchEvent(evt);
           }
         };
         exec(callback, callback, 'ZoopAPI', 'charge', [valueToCharge, paymentOption,

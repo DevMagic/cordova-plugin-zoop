@@ -126,8 +126,8 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
     };
 
     function addListener(name, method) {
-      document.removeEventListener(name, method);
-      document.addEventListener(name, method);
+      window.removeEventListener(name, method);
+      window.addEventListener(name, method);
     }
 
     var forShowMessage = function(e){
