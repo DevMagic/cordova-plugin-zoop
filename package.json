@@ -1,0 +1,26 @@
+{
+  "name": "cordova-plugin-zoop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "cordova-paramedic": "^0.5.0"
+  },
+  "devDependencies": {
+    "jasmine": "^3.4.0"
+  },
+  "scripts": {
+    "test": "cd ../cordova-plugin-zoop-test && cordova plugin remove cordova-plugin-zoop-tests cordova-plugin-zoop & cordova plugin add ../cordova-plugin-zoop ../cordova-plugin-zoop/tests && cordova run android",
+    "build": "cd ../cordova-plugin-zoop-test && cordova plugin remove cordova-plugin-zoop-tests cordova-plugin-zoop & cordova plugin add ../cordova-plugin-zoop ../cordova-plugin-zoop/tests && cordova prepare android",
+    "android": "cd ../cordova-plugin-zoop-test && cordova run android --emulator",
+    "test:android": "cordova-paramedic --cleanUpAfterRun --verbose --platform android --plugin .",
+    "test:browser": "cordova-paramedic --cleanUpAfterRun --verbose --platform browser --plugin .",
+    "test:ios": "cordova-paramedic --cleanUpAfterRun --verbose --platform ios --plugin .",
+    "test:windows": "cordova-paramedic --config .paramedic.windows.config.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

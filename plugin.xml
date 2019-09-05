@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-zoop" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Cordova Plugin Zoop</name>
+    <js-module name="ZoopAPI" src="www/ZoopAPI.js">
+        <clobbers target="ZoopAPI" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="ZoopAPI">
+                <param name="android-package" value="org.apache.cordova.plugin.ZoopAPI"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <framework src="com.squareup.okhttp3:okhttp:3.6.0" />
+        <framework src="com.google.code.gson:gson:2.7" />
+        <framework src="com.squareup.okhttp3:okhttp-urlconnection:3.4.1" />
+        <framework src="com.squareup.retrofit2:retrofit:2.1.0" />
+        <framework src="com.squareup.retrofit2:converter-gson:2.1.0" />
+        <framework src="com.squareup.okhttp3:logging-interceptor:3.9.1" />
+
+
+        <source-file src="src/android/ZoopAPI.java" target-dir="src/org/apache/cordova/plugin" />
+        <lib-file src="src/android/zoop_emv_android_sdk_2.0.8_prod.jar" />
+    </platform>
+</plugin>
