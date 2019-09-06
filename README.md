@@ -166,12 +166,25 @@ function (event){
 ```
 
 `showMessage`
+
 ```js
 event.detail =
 {
   "message": "Insira ou passe o Cartão",
   "terminalMessageType": "ACTION_INSERT_CARD"
 }
+```
+
+`paymentFailed`
+
+```js
+TODO: Document
+```
+
+`paymentDuplicated`
+
+```js
+TODO: Document
 ```
   
 `paymentSuccessful`
