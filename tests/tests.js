@@ -20,6 +20,11 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
    *
    */
   /* jshint jasmine: true */
+
+  let MARKET_PLACE_ID = '-';
+  let SELLER_ID = '-';
+  let PUBLISHABLE_KEY = '-';
+
   exports.defineAutoTests = function () {
     describe('ZoopAPI', function () {
       it('should be defined', function () {
@@ -51,8 +56,8 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
       addListener('paymentSuccessful', forPaymentSuccessful);
 
       window.ZoopAPI.charge(
-        1, 0, 1, '-',
-        '-', '-'
+        1, 0, 1, MARKET_PLACE_ID,
+        SELLER_ID, PUBLISHABLE_KEY
       );
     });
 
@@ -107,8 +112,8 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
         addListener('paymentSuccessful', forPaymentSuccessful);
 
         window.ZoopAPI.charge(
-          1, 99, 1, '-',
-          '-', '-'
+          1, 0, 1, MARKET_PLACE_ID,
+          SELLER_ID, PUBLISHABLE_KEY
         );
       });
     }
@@ -189,10 +194,6 @@ cordova.define("cordova-plugin-zoop-tests.tests", function (require, exports, mo
     var forUpdateDeviceListForUserSelection = function(e){
       contentEl.innerHTML += '<p>Event <i>updateDeviceListForUserSelection</i></p>';
       contentEl.innerHTML += '<code>' + JSON.stringify(e.detail, null, 2) + '</code>';
-//      contentEl.innerHTML += '<p>Auto selectin the first</p>';
-//      window.ZoopAPI.requestZoopDeviceSelection(e.detail[0], function(err){
-//        contentEl.innerHTML += '<p>Err ' + err + '</p>';
-//      });
     };
 
   };
