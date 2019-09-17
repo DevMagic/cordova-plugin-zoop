@@ -327,3 +327,9 @@ TODO: Document
   "customer": "515545235"
 }
 ```
+
+ ## Tests
+ 
+ Here is the test runner application
+ 
+ https://github.com/DevMagic/cordova-plugin-zoop-test-runner
