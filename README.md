@@ -1,5 +1,11 @@
 # cordova-plugin-zoop
 
+<p align="center">
+  <img src="https://zoop.com.br/wp-content/themes/zoop/img/logo.svg"/>
+</p>
+
+> Unofficial Zoop SDK for Cordova 
+
 This plugin defines `window.ZoopAPI` object, that enable access to the zoop.com.br Mobile Android (& IOS soon).
 
 ## Installation
