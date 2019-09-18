@@ -333,3 +333,5 @@ TODO: Document
  Here is the test runner application
  
  https://github.com/DevMagic/cordova-plugin-zoop-test-runner
+
+* Use copy_from_test.bat if you want to copy edit files from Android.
