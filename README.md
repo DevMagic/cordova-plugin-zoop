@@ -152,8 +152,8 @@ window.addEventListener('paymentDuplicated', method);
 window.addEventListener('paymentSuccessful', method);
 
 window.ZoopAPI.charge(
-    1, //Value to Charge 
-    0, //Payment Option
+    1.pp, //Value to Charge 
+    0, //Payment Option - Credit(0) - Debit(1) 0 Credit with Installments(2) - Voucher(3) 
     1, //Number of Installments 
     'marketplaceId', 
     'sellerId', 
