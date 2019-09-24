@@ -48,10 +48,15 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
             cordova.getThreadPool().execute(this::initializeZoopAPI);
             return true;
         } else if (action.equals("startTerminalsDiscovery")) {
-            if (this.terminalDiscoveryCallback != null)
-                this.terminalDiscoveryCallback.success();
+            if (this.terminalDiscoveryCallback != null) {
+                return true;
+            }
             this.terminalDiscoveryCallback = callbackContext;
             cordova.getThreadPool().execute(this::startTerminalsDiscovery);
+            return true;
+        } else if (action.equals("finishTerminalDiscovery")) {
+            this.terminalDiscoveryCallback = null;
+            cordova.getThreadPool().execute(this::finishTerminalDiscovery);
             return true;
         } else if (action.equals("enableDeviceBluetoothAdapter")){
             cordova.getThreadPool().execute(this::enableDeviceBluetoothAdapter);
@@ -127,6 +132,15 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
         Log.i("ZoopAPI", ">>> startTerminalsDiscovery");
         try {
             getTerminalListManager().startTerminalsDiscovery();
+        } catch (Exception e){
+            callback.error("Hey dev, try to initialize the API first - " + e.getMessage());
+        }
+    }
+
+    private void finishTerminalDiscovery() {
+        Log.i("ZoopAPI", ">>> finishTerminalDiscovery");
+        try {
+            getTerminalListManager().finishTerminalDiscovery();
         } catch (Exception e){
             callback.error("Hey dev, try to initialize the API first - " + e.getMessage());
         }

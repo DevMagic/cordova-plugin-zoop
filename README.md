@@ -43,6 +43,9 @@ window.ZoopAPI.startTerminalsDiscovery(
       contentEl.innerHTML = '<p>ERR ${err}</p>';
     }
 );
+
+// To close terminal, you need to call
+window.ZoopAPI.finishTerminalDiscovery();
 ```
 
 ### *Listeners*

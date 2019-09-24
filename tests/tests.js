@@ -58,6 +58,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     )
   });
 
+  createActionButton('finishTerminalDiscovery', function () {
+    window.ZoopAPI.finishTerminalDiscovery();
+  });
+
   var createButtonForSelectDevice = function(name, device){
     createActionButton('Activate ' + name, function(){
       contentEl.innerHTML += '<pre>' + device + '</pre>';
@@ -93,7 +97,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         SELLER_ID, PUBLISHABLE_KEY
       );
     });
-  }
+  };
 
   var testBluetooth = 'TODO';
 
