@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-zoop",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Unofficial cordova plugin for Zoop MPOS integration by Devmagic - zoop.com.br",
   "directories": {
     "test": "tests"
