@@ -48,9 +48,6 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
             cordova.getThreadPool().execute(this::initializeZoopAPI);
             return true;
         } else if (action.equals("startTerminalsDiscovery")) {
-            if (this.terminalDiscoveryCallback != null) {
-                return true;
-            }
             this.terminalDiscoveryCallback = callbackContext;
             cordova.getThreadPool().execute(this::startTerminalsDiscovery);
             return true;
@@ -108,11 +105,11 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
 
     private void charge(ChargeArgs args) throws Exception {
         Log.i("ZoopAPI", ">>> charge");
-        Log.d("ZoopAPI", "JSON " + getTerminalListManager().getCurrentSelectedZoopTerminal().toString(2));
-        JSONArray jsA = new JSONArray(getTerminalListManager().getAvailableZoopTerminalDevices());
-        getTerminalListManager().checkTerminalCompatibility(getTerminalListManager().getCurrentSelectedZoopTerminal(), this);
+//        Log.d("ZoopAPI", "JSON " + getTerminalListManager().getCurrentSelectedZoopTerminal().toString(2));
+//        JSONArray jsA = new JSONArray(getTerminalListManager().getAvailableZoopTerminalDevices());
+//        getTerminalListManager().checkTerminalCompatibility(getTerminalListManager().getCurrentSelectedZoopTerminal(), this);
 
-        Log.d("ZoopAPI", "JSA " + jsA.toString(2));
+//        Log.d("ZoopAPI", "JSA " + jsA.toString(2));
 
         ZoopTerminalPayment zoopTerminalPayment = new ZoopTerminalPayment();
         Log.d("ZoopAPI", "Minimun " + zoopTerminalPayment.getMinimumChargeValue().doubleValue());
