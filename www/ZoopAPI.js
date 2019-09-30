@@ -40,3 +40,7 @@ exports.charge = function (valueToCharge, paymentOption, numberOfInstallments, m
   cordova.exec(callback, callback, 'ZoopAPI', 'charge', [valueToCharge, paymentOption,
     numberOfInstallments, marketplaceId, sellerId, publishableKey]);
 };
+
+exports.requestAbortCharge = function (err) {
+  cordova.exec(null, err, 'ZoopAPI', 'requestAbortCharge');
+};

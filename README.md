@@ -151,6 +151,7 @@ window.ZoopAPI.initialize();
 
 window.addEventListener('showMessage'      , method);
 window.addEventListener('paymentFailed'    , method);
+window.addEventListener('paymentAborted'    , method);
 window.addEventListener('paymentDuplicated', method);
 window.addEventListener('paymentSuccessful', method);
 
@@ -189,6 +190,18 @@ event.detail =
 ```js
 TODO: Document
 ```
+
+---
+ 
+`paymentAborted`
+
+Evento que acontece quando a ação é abortada pela aplicação usando o método requestAbort
+
+```js
+returns a null object
+```
+
+---
 
 `paymentDuplicated`
 
@@ -330,6 +343,18 @@ TODO: Document
   "customer": "515545235"
 }
 ```
+
+---
+
+## requestAbortCharge
+
+The way to abort a charge operation
+
+```js
+window.ZoopAPI.requestAbortCharge(err => console.log('Error on abort', err));
+```
+
+---
 
  ## Tests
  

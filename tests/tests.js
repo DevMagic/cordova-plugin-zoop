@@ -29,6 +29,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     addListener('showMessage'      , forShowMessage);
     addListener('paymentFailed'    , forPaymentFailed);
+    addListener('paymentAborted'    , forPaymentAborted);
     addListener('paymentDuplicated', forPaymentDuplicated);
     addListener('paymentSuccessful', forPaymentSuccessful);
 
@@ -89,6 +90,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
       addListener('showMessage'      , forShowMessage);
       addListener('paymentFailed'    , forPaymentFailed);
+      addListener('paymentAborted'    , forPaymentAborted);
       addListener('paymentDuplicated', forPaymentDuplicated);
       addListener('paymentSuccessful', forPaymentSuccessful);
 
@@ -96,6 +98,17 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         1, 0, 1, MARKET_PLACE_ID,
         SELLER_ID, PUBLISHABLE_KEY
       );
+    });
+  };
+
+  var isButtonForCancelChargeCreated = false;
+
+  var createButtonForCancelCharge = function() {
+    if (isButtonForCancelChargeCreated)
+      return;
+    isButtonForCancelChargeCreated = true;
+    createActionButton('Abort Charge', function () {
+      window.ZoopAPI.requestAbortCharge(err => console.log('Error on abort', err));
     });
   };
 
@@ -130,6 +143,13 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     `.concat(contentEl.innerHTML);
   }
 
+  var forPaymentAborted = function(e){
+    contentEl.innerHTML = `
+      <p>Event <i>paymentAborted</i></p>
+      <pre>${JSON.stringify(e.detail, null, 2)}</pre>
+    `.concat(contentEl.innerHTML);
+  }
+
   var forPaymentDuplicated = function(e){
     contentEl.innerHTML = `
       <p>Event <i>paymentDuplicated</i></p>
@@ -155,6 +175,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     contentEl.innerHTML += '<p>Event <i>deviceSelectedResult</i></p>';
     contentEl.innerHTML += '<pre>' + JSON.stringify(e.detail, null, 2) + '</pre>';
     createButtonForCharge();
+    createButtonForCancelCharge();
   };
 
   var deviceIsNotShowing = true;

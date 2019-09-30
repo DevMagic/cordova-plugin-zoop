@@ -32,13 +32,21 @@ import static org.apache.cordova.PluginResult.Status.OK;
 public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, TerminalPaymentListener, ApplicationDisplayListener, ZoopTerminalKeyValidatorListener {
 
     private CallbackContext terminalDiscoveryCallback;
+    private CallbackContext chargeCallback;
     private CallbackContext callback;
     private TerminalListManager _terminalListManager;
+    private ZoopTerminalPayment _zoopTerminalPayment;
 
     private TerminalListManager getTerminalListManager(){
         if (_terminalListManager == null)
             _terminalListManager = new TerminalListManager(this, cordova.getContext());
         return _terminalListManager;
+    }
+
+    private ZoopTerminalPayment getZoopTerminalPayment(){
+        if (_zoopTerminalPayment == null)
+            _zoopTerminalPayment = new ZoopTerminalPayment();
+        return _zoopTerminalPayment;
     }
 
     @Override
@@ -59,10 +67,21 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
             cordova.getThreadPool().execute(this::enableDeviceBluetoothAdapter);
             return true;
         } else if (action.equals("charge")) {
+            this.chargeCallback = callbackContext;
             ChargeArgs chargeArgs = new ChargeArgs(args);
             cordova.getThreadPool().execute(() -> {
                 try {
                     charge(chargeArgs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.error(e.getMessage());
+                }
+            });
+            return true;
+        } else if (action.equals("requestAbortCharge")) {
+            cordova.getThreadPool().execute(() -> {
+                try {
+                    requestAbortCharge();
                 } catch (Exception e) {
                     e.printStackTrace();
                     callback.error(e.getMessage());
@@ -103,6 +122,10 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
         super.onDestroy();
     }
 
+    private void requestAbortCharge() throws Exception {
+        getZoopTerminalPayment().requestAbortCharge();
+    }
+
     private void charge(ChargeArgs args) throws Exception {
         Log.i("ZoopAPI", ">>> charge");
 //        Log.d("ZoopAPI", "JSON " + getTerminalListManager().getCurrentSelectedZoopTerminal().toString(2));
@@ -111,7 +134,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
 
 //        Log.d("ZoopAPI", "JSA " + jsA.toString(2));
 
-        ZoopTerminalPayment zoopTerminalPayment = new ZoopTerminalPayment();
+        ZoopTerminalPayment zoopTerminalPayment = getZoopTerminalPayment();
         Log.d("ZoopAPI", "Minimun " + zoopTerminalPayment.getMinimumChargeValue().doubleValue());
         zoopTerminalPayment.setTerminalPaymentListener(this);
         zoopTerminalPayment.setApplicationDisplayListener(this);
@@ -217,7 +240,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
     @Override
     public void paymentFailed(JSONObject data) {
         Log.i("ZoopAPI", ">>> paymentFailed");
-        callback.success(getResult(
+        chargeCallback.success(getResult(
                 "TerminalPaymentListener",
                 "paymentFailed",
                 data));
@@ -231,8 +254,7 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
                 "TerminalPaymentListener",
                 "paymentDuplicated",
                 data));
-        callback.sendPluginResult(result);
-
+        chargeCallback.sendPluginResult(result);
     }
 
     // TerminalPaymentListener
@@ -243,13 +265,18 @@ public class ZoopAPI extends CordovaPlugin implements DeviceSelectionListener, T
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        callback.success(getResult("TerminalPaymentListener", "paymentSuccessful", data));
+        chargeCallback.success(getResult("TerminalPaymentListener", "paymentSuccessful", data));
     }
 
     // TerminalPaymentListener
     @Override
     public void paymentAborted() {
         Log.i("Zoop", "paymentAborted");
+        Log.i("ZoopAPI", ">>> paymentFailed");
+        chargeCallback.success(getResult(
+                "TerminalPaymentListener",
+                "paymentAborted",
+                null));
     }
 
     // TerminalPaymentListener
